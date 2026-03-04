@@ -12,7 +12,7 @@ import {
   savePlayerId,
   upsertSubmission,
 } from './lib/storage'
-import { storageMode } from './lib/supabase'
+import { storageMode, supabaseProjectRef } from './lib/supabase'
 import { buildDailyRanking, buildSeasonStandings, parseWordleShare } from './lib/wordle'
 import type { ParsedWordleShare, Player, Submission } from './types'
 
@@ -145,12 +145,7 @@ function App() {
   )
 
   useEffect(() => {
-    if (!currentPlayerId) {
-      return
-    }
-
-    if (!currentPlayer) {
-      setCurrentPlayerId('')
+    if (!currentPlayerId || !currentPlayer) {
       return
     }
 
@@ -329,6 +324,9 @@ function App() {
             <span className="badge badge--secondary">
               Stockage: {storageMode === 'supabase' ? 'Supabase' : 'Local (démo)'}
             </span>
+            {storageMode === 'supabase' && supabaseProjectRef ? (
+              <span className="badge badge--secondary">Projet: {supabaseProjectRef}</span>
+            ) : null}
           </div>
         </header>
 
@@ -422,8 +420,8 @@ function App() {
                 · Indices avant réussite <strong>{formatHintScore(parsedShare.hintScoreBeforeSolve)}</strong>
               </p>
               <div className="emoji-grid">
-                {parsedShare.attempts.map((attempt) => (
-                  <code key={`${attempt.row}-${attempt.hintScore}`}>{attempt.row}</code>
+                {parsedShare.attempts.map((attempt, index) => (
+                  <code key={`${parsedShare.puzzleNumber}-${index}`}>{attempt.row}</code>
                 ))}
               </div>
             </div>

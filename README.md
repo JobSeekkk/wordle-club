@@ -30,8 +30,8 @@ For each puzzle:
 
 Supabase mode is enabled when:
 
-- `VITE_SUPABASE_URL` is set
-- `VITE_SUPABASE_ANON_KEY` is set
+- `VITE_WORDLE_SUPABASE_URL` is set
+- `VITE_WORDLE_SUPABASE_ANON_KEY` is set
 
 ## Setup
 
@@ -60,7 +60,7 @@ Recommended quick setup:
 1. Create a new GitHub repo (separate from JobSeek).
 2. Push this project.
 3. Deploy on Vercel or Netlify.
-4. Add env vars (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+4. Add env vars (`VITE_WORDLE_SUPABASE_URL`, `VITE_WORDLE_SUPABASE_ANON_KEY`).
 5. Share URL + one league code with your friends.
 
 For basic privacy, use an unguessable league code and private sharing. If you want strict access control, add auth + stricter RLS as a next step.
