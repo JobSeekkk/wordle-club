@@ -316,8 +316,8 @@ function App() {
           <p className="eyebrow">Wordle League</p>
           <h1>Compétition Wordle entre amis</h1>
           <p>
-            Score principal: moins de tentatives = meilleur classement. Égalité: on compare le score d&apos;indices avant la
-            ligne gagnante ({'<'} meilleur).
+            Score principal: moins de tentatives = meilleur classement. Égalité: on compare les indices du dernier essai
+            avant la ligne gagnante ({'<'} meilleur).
           </p>
           <div className="hero-meta">
             <span className="badge">Points Mario Kart: {MARIO_KART_12_POINTS.join(' / ')}</span>
@@ -417,7 +417,8 @@ function App() {
                     ? `${parsedShare.attemptsUsed}/${parsedShare.maxAttempts}`
                     : `X/${parsedShare.maxAttempts}`}
                 </strong>{' '}
-                · Indices avant réussite <strong>{formatHintScore(parsedShare.hintScoreBeforeSolve)}</strong>
+                · Indices du dernier essai avant réussite{' '}
+                <strong>{formatHintScore(parsedShare.hintScoreBeforeSolve)}</strong>
               </p>
               <div className="emoji-grid">
                 {parsedShare.attempts.map((attempt, index) => (
@@ -461,7 +462,7 @@ function App() {
                     <th>Rang</th>
                     <th>Joueur</th>
                     <th>Score</th>
-                    <th>Indices avant réussite</th>
+                    <th>Indices dernier essai avant réussite</th>
                     <th>Points</th>
                   </tr>
                 </thead>

@@ -102,7 +102,9 @@ export function parseWordleShare(rawText: string): ParsedWordleShare {
 
   const totalHintScore = attempts.reduce((sum, attempt) => sum + attempt.hintScore, 0)
   const hintScoreBeforeSolve = solved
-    ? attempts.slice(0, Math.max(0, attempts.length - 1)).reduce((sum, attempt) => sum + attempt.hintScore, 0)
+    ? attemptsUsed !== null && attemptsUsed > 1
+      ? attempts[attemptsUsed - 2].hintScore
+      : 0
     : totalHintScore
 
   return {

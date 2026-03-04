@@ -19,7 +19,7 @@ For each puzzle:
 
 1. Solved rows rank above unsolved rows.
 2. Among solved rows, fewer attempts are better.
-3. If attempts are equal, lower `hintScoreBeforeSolve` is better.
+3. If attempts are equal, lower `hintScoreBeforeSolve` is better, where `hintScoreBeforeSolve` is computed from only the **single guess just before the winning row** (`green = 1`, `yellow = 0.5`).
 4. If still equal, lower total hint score is better.
 5. Exact ties get the same rank and same points.
 
@@ -52,6 +52,12 @@ cp .env.example .env.local
 2. Open SQL editor and run: [`supabase/schema.sql`](/Users/paul/wordle-club/supabase/schema.sql)
 3. Copy project URL + anon key into `.env.local`.
 4. Restart dev server.
+
+### Existing data migration (after changing tie-break logic)
+
+If you already have submissions stored with the old cumulative tie-break logic, run:
+
+- [`supabase/recalculate-hints-last-guess.sql`](/Users/paul/wordle-club/supabase/recalculate-hints-last-guess.sql)
 
 ## Deploy for friends
 
