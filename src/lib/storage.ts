@@ -32,6 +32,14 @@ function normalizeLeagueCode(rawLeagueCode: string): string {
   return rawLeagueCode.trim().toUpperCase()
 }
 
+function normalizePlayerName(rawName: string): string {
+  return rawName.trim().replace(/\s+/g, ' ')
+}
+
+function playerNameKey(name: string): string {
+  return normalizePlayerName(name).toLowerCase()
+}
+
 function mapPlayerRow(row: {
   id: string
   league_code: string
@@ -123,7 +131,7 @@ export async function savePlayer(input: {
   color: string
 }): Promise<Player> {
   const normalizedLeagueCode = normalizeLeagueCode(input.leagueCode)
-  const normalizedName = input.name.trim()
+  const normalizedName = normalizePlayerName(input.name)
 
   if (!normalizedName) {
     throw new Error('Le nom du joueur est obligatoire.')
@@ -138,6 +146,40 @@ export async function savePlayer(input: {
           color: input.color,
         })
         .eq('id', input.playerId)
+        .eq('league_code', normalizedLeagueCode)
+        .select('id, league_code, name, color, created_at')
+        .single()
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      return mapPlayerRow(data)
+    }
+
+    // If the same name already exists in this league, reuse that profile
+    // instead of creating duplicates (helpful when local storage is reset on phone).
+    const { data: existingPlayers, error: existingError } = await supabase
+      .from('players')
+      .select('id, league_code, name, color, created_at')
+      .eq('league_code', normalizedLeagueCode)
+      .ilike('name', normalizedName)
+      .order('created_at', { ascending: true })
+      .limit(1)
+
+    if (existingError) {
+      throw new Error(existingError.message)
+    }
+
+    if (existingPlayers && existingPlayers.length > 0) {
+      const existingPlayer = existingPlayers[0]
+      const { data, error } = await supabase
+        .from('players')
+        .update({
+          name: normalizedName,
+          color: input.color,
+        })
+        .eq('id', existingPlayer.id)
         .eq('league_code', normalizedLeagueCode)
         .select('id, league_code, name, color, created_at')
         .single()
@@ -176,6 +218,22 @@ export async function savePlayer(input: {
     writeJson(playersKey(normalizedLeagueCode), updatedPlayers)
 
     const updated = updatedPlayers.find((player) => player.id === input.playerId)
+
+    if (!updated) {
+      throw new Error('Joueur introuvable.')
+    }
+
+    return updated
+  }
+
+  const existingLocalPlayer = localPlayers.find((player) => playerNameKey(player.name) === playerNameKey(normalizedName))
+
+  if (existingLocalPlayer) {
+    const updatedPlayers = localPlayers.map((player) =>
+      player.id === existingLocalPlayer.id ? { ...player, name: normalizedName, color: input.color } : player,
+    )
+    writeJson(playersKey(normalizedLeagueCode), updatedPlayers)
+    const updated = updatedPlayers.find((player) => player.id === existingLocalPlayer.id)
 
     if (!updated) {
       throw new Error('Joueur introuvable.')
